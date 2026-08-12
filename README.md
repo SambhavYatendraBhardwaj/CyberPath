@@ -1,6 +1,7 @@
 # CyberPath — Graph-Based Attack Path & Risk Analyzer
 ![alt text](<Screenshot 2026-08-12 083628.png>)
 Demo Link- http://127.0.0.1:8000/dashboard/
+
 CyberPath is a security analysis tool that models an organization's IT infrastructure as a graph — devices, servers, databases, and the connections between them — and answers a question relational databases struggle with: **"If this laptop gets compromised, what can an attacker reach, and how?"**
 
 It traces multi-hop attack paths from a compromised entry point to critical assets (like customer or HR databases), scores overall risk, and shows the blast radius of a breach.
@@ -59,7 +60,7 @@ Employee-Laptop-07 → Web-Server-01 → App-Server-01 → File-Server-01 → HR
 ---
 
 ## Project structure
-![alt text](<Screenshot 2026-08-12 083449.png>)
+
 ```
 cyberpath/
 ├── backend/

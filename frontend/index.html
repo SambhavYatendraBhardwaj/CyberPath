@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CyberPath | Security Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 24px 40px;
+            border-bottom: 1px solid #1f2937;
+            background: #111827;
+        }
+
+        header h1 {
+            font-size: 28px;
+        }
+
+        header p {
+            color: #9ca3af;
+            margin-top: 6px;
+        }
+
+        .container {
+            padding: 30px 40px;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .entry-point {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .entry-point span {
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .entry-point h2 {
+            margin-top: 8px;
+            font-size: 20px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .card {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .card-title {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .risk-card {
+            border: 1px solid #7f1d1d;
+        }
+
+        .risk-level {
+            color: #f87171;
+        }
+
+        .section {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section h2 {
+            margin-bottom: 18px;
+        }
+
+        .asset {
+            padding: 16px;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .asset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .critical {
+            color: #f87171;
+        }
+
+        .high {
+            color: #fb923c;
+        }
+
+        .medium {
+            color: #facc15;
+        }
+
+        .path {
+            color: #9ca3af;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .vulnerability {
+            padding: 14px;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .vulnerability:last-child {
+            border-bottom: none;
+        }
+
+        .severity {
+            font-weight: bold;
+        }
+
+        .attack-path {
+            background: #0b1120;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .attack-path .target {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .attack-path .route {
+            color: #93c5fd;
+            margin-top: 10px;
+            line-height: 1.8;
+        }
+
+        .loading {
+            color: #9ca3af;
+            padding: 20px 0;
+        }
+
+        .error {
+            color: #f87171;
+        }
+
+        @media (max-width: 900px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>CYBERPATH</h1>
+    <p>Graph-Based Attack Path & Risk Analyzer</p>
+</header>
+
+<div class="container">
+
+    <div class="entry-point">
+        <span>COMPROMISED ENTRY POINT</span>
+        <h2 id="entryPoint">Loading...</h2>
+    </div>
+
+    <div class="cards">
+
+        <div class="card risk-card">
+            <div class="card-title">Risk Score</div>
+            <div class="card-value" id="riskScore">-</div>
+            <div class="risk-level" id="riskLevel">-</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Reachable Assets</div>
+            <div class="card-value" id="reachableAssets">-</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Critical Assets</div>
+            <div class="card-value critical" id="criticalAssets">-</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Vulnerabilities</div>
+            <div class="card-value" id="vulnerabilities">-</div>
+        </div>
+
+    </div>
+
+
+    <!-- ATTACK PATHS -->
+
+    <div class="section">
+
+        <h2>Attack Paths</h2>
+
+        <div id="attackPaths">
+            <div class="loading">Loading attack paths...</div>
+        </div>
+
+    </div>
+
+
+    <!-- AFFECTED ASSETS -->
+
+    <div class="section">
+
+        <h2>Impact Analysis</h2>
+
+        <div id="assets">
+            <div class="loading">Loading affected assets...</div>
+        </div>
+
+    </div>
+
+
+    <!-- VULNERABILITIES -->
+
+    <div class="section">
+
+        <h2>Known Vulnerabilities</h2>
+
+        <div id="vulnerabilityList">
+            <div class="loading">Loading vulnerabilities...</div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const API = "http://127.0.0.1:8000";
+
+
+async function fetchAPI(endpoint) {
+
+    const response = await fetch(API + endpoint);
+
+    if (!response.ok) {
+        throw new Error(
+            `${endpoint} returned ${response.status}`
+        );
+    }
+
+    return await response.json();
+}
+
+
+async function loadRiskAnalysis() {
+
+    try {
+
+        const data =
+            await fetchAPI("/api/risk-analysis");
+
+        document.getElementById("entryPoint").textContent =
+            data.entry_point;
+
+        document.getElementById("riskScore").textContent =
+            data.risk_score + "/100";
+
+        document.getElementById("riskLevel").textContent =
+            data.risk_level;
+
+        document.getElementById("reachableAssets").textContent =
+            data.impact_summary.total_reachable_assets;
+
+        document.getElementById("criticalAssets").textContent =
+            data.impact_summary.critical_assets;
+
+        document.getElementById("vulnerabilities").textContent =
+            data.impact_summary.known_vulnerabilities;
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+async function loadAttackPaths() {
+
+    const container =
+        document.getElementById("attackPaths");
+
+    try {
+
+        const data =
+            await fetchAPI("/api/attack-path");
+
+        container.innerHTML = "";
+
+        data.paths.forEach(path => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "attack-path";
+
+            div.innerHTML = `
+                <div class="target">
+                    Target: ${path.target}
+                </div>
+
+                <div>
+                    ${path.hops} hops
+                </div>
+
+                <div class="route">
+                    ${path.path.join(" → ")}
+                </div>
+            `;
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+    catch (error) {
+
+        container.innerHTML =
+            `<div class="error">
+                Failed to load attack paths
+             </div>`;
+
+        console.error(error);
+
+    }
+
+}
+
+
+async function loadImpactAnalysis() {
+
+    const container =
+        document.getElementById("assets");
+
+    try {
+
+        const data =
+            await fetchAPI("/api/impact-analysis");
+
+        container.innerHTML = "";
+
+        data.affected_assets.forEach(asset => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "asset";
+
+            const criticality =
+                asset.criticality.toLowerCase();
+
+            div.innerHTML = `
+                <div class="asset-header">
+
+                    <strong>
+                        ${asset.name}
+                    </strong>
+
+                    <span class="${criticality}">
+                        ${asset.criticality}
+                    </span>
+
+                </div>
+
+                <div class="path">
+                    ${asset.path.join(" → ")}
+                    <br>
+                    ${asset.hops} hops
+                </div>
+            `;
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+    catch (error) {
+
+        container.innerHTML =
+            `<div class="error">
+                Failed to load impact analysis
+             </div>`;
+
+        console.error(error);
+
+    }
+
+}
+
+
+async function loadVulnerabilities() {
+
+    const container =
+        document.getElementById("vulnerabilityList");
+
+    try {
+
+        const data =
+            await fetchAPI("/api/risk-analysis");
+
+        container.innerHTML = "";
+
+        data.vulnerabilities.forEach(vulnerability => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "vulnerability";
+
+            div.innerHTML = `
+                <strong>
+                    ${vulnerability.id}
+                </strong>
+
+                <span class="severity">
+                    - ${vulnerability.severity}
+                </span>
+
+                <div class="path">
+                    Server: ${vulnerability.server}
+                </div>
+            `;
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+    catch (error) {
+
+        container.innerHTML =
+            `<div class="error">
+                Failed to load vulnerabilities
+             </div>`;
+
+        console.error(error);
+
+    }
+
+}
+
+
+async function loadDashboard() {
+
+    await Promise.all([
+        loadRiskAnalysis(),
+        loadAttackPaths(),
+        loadImpactAnalysis(),
+        loadVulnerabilities()
+    ]);
+
+}
+
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
